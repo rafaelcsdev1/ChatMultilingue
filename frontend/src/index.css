@@ -393,6 +393,38 @@ button {
   border: 1px solid var(--border);
 }
 
+.profile-form {
+  display: grid;
+  gap: var(--space-md);
+  margin-top: var(--space-md);
+}
+
+.profile-form label {
+  font-weight: 600;
+}
+
+.profile-form select {
+  width: 100%;
+  padding: var(--space-md);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.level-description {
+  padding: var(--space-md);
+  border-radius: var(--radius-sm);
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+.status-message {
+  margin-top: var(--space-sm);
+  color: var(--text-muted);
+}
+
 .not-found-panel .page-card {
   display: grid;
   gap: var(--space-sm);

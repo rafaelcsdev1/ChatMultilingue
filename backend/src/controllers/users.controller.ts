@@ -21,3 +21,20 @@ export async function getCurrentUser(req: Request, res: Response, next: NextFunc
     return next(error);
   }
 }
+
+export async function updateCurrentUserLevel(req: Request, res: Response, next: NextFunction) {
+  try {
+    const userId = req.user?.userId;
+
+    if (!userId) {
+      throw new AppError('Usuário não autenticado', 401);
+    }
+
+    const { level } = req.body;
+    const user = await UsersService.updateUserLevel(userId, level);
+
+    return res.status(200).json(user);
+  } catch (error) {
+    return next(error);
+  }
+}

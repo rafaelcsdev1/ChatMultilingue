@@ -12,10 +12,10 @@ model User {
   email            String        @unique
   passwordHash     String
   fullName         String?
-  role             UserRole      @default(USER)
+  role             UserRole       @default(USER)
   nativeLanguageId String?
   targetLanguageId String?
-  level            String?
+  level            LanguageLevel?
   objectives       String?
   preferences      Json?
   refreshTokenHash String?
@@ -134,6 +134,15 @@ model Statistic {
 enum UserRole {
   USER
   ADMIN
+}
+
+enum LanguageLevel {
+  A1
+  A2
+  B1
+  B2
+  C1
+  C2
 }
 
 enum ScenarioDifficulty {
