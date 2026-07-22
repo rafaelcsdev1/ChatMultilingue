@@ -1,6 +1,8 @@
+import { NavLink } from 'react-router-dom';
+
 interface NavItem {
   label: string;
-  href: string;
+  to: string;
   icon: string;
 }
 
@@ -10,12 +12,12 @@ interface SidebarProps {
 }
 
 const navItems: NavItem[] = [
-  { label: 'Dashboard', href: '#dashboard', icon: '🏠' },
-  { label: 'Conversas', href: '#chat', icon: '💬' },
-  { label: 'Lições', href: '#lessons', icon: '📚' },
-  { label: 'Vocabulário', href: '#vocabulary', icon: '📝' },
-  { label: 'Progresso', href: '#progress', icon: '📈' },
-  { label: 'Perfil', href: '#profile', icon: '👤' }
+  { label: 'Dashboard', to: '/', icon: '🏠' },
+  { label: 'Conversas', to: '/chat', icon: '💬' },
+  { label: 'Lições', to: '/lessons', icon: '📚' },
+  { label: 'Vocabulário', to: '/vocabulary', icon: '📝' },
+  { label: 'Progresso', to: '/progress', icon: '📈' },
+  { label: 'Perfil', to: '/profile', icon: '👤' }
 ];
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
@@ -36,10 +38,16 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
       <nav className="sidebar-nav" aria-label="Navegação principal">
         {navItems.map((item) => (
-          <a key={item.label} href={item.href} className="nav-link" onClick={onClose}>
+          <NavLink
+            key={item.label}
+            to={item.to}
+            end={item.to === '/'}
+            className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
+            onClick={onClose}
+          >
             <span className="nav-icon" aria-hidden="true">{item.icon}</span>
             <span>{item.label}</span>
-          </a>
+          </NavLink>
         ))}
       </nav>
 

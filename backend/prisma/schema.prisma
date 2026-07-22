@@ -1,0 +1,168 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String        @id @default(cuid())
+  email            String        @unique
+  passwordHash     String
+  fullName         String?
+  role             UserRole      @default(USER)
+  nativeLanguageId String?
+  targetLanguageId String?
+  level            String?
+  objectives       String?
+  preferences      Json?
+  refreshTokenHash String?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  lastLogin        DateTime?
+
+  nativeLanguage Language?      @relation("NativeLanguageUsers", fields: [nativeLanguageId], references: [id])
+  targetLanguage Language?      @relation("TargetLanguageUsers", fields: [targetLanguageId], references: [id])
+
+  conversations   Conversation[]
+  vocabulary      Vocabulary[]
+  statistics      Statistic[]
+}
+
+model Language {
+  id         String         @id @default(cuid())
+  code       String         @unique
+  name       String
+  nativeName String?
+  direction  String?        @default("ltr")
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+
+  nativeUsers   User[]       @relation("NativeLanguageUsers")
+  targetUsers   User[]       @relation("TargetLanguageUsers")
+  scenarios     Scenario[]
+  conversations Conversation[]
+  vocabulary    Vocabulary[]
+  messages      Message[]
+}
+
+model Scenario {
+  id          String             @id @default(cuid())
+  slug        String             @unique
+  name        String
+  description String?
+  category    String?
+  difficulty  ScenarioDifficulty @default(BEGINNER)
+  languageId  String
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  language      Language      @relation(fields: [languageId], references: [id])
+  conversations Conversation[]
+}
+
+model Conversation {
+  id              String             @id @default(cuid())
+  userId          String
+  languageId      String
+  scenarioId      String?
+  title           String?
+  status          ConversationStatus @default(ACTIVE)
+  startedAt       DateTime           @default(now())
+  endedAt         DateTime?
+  durationSeconds Int?
+  feedback        String?
+  rating          Int?
+  metadata        Json?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  user      User      @relation(fields: [userId], references: [id])
+  language  Language  @relation(fields: [languageId], references: [id])
+  scenario  Scenario? @relation(fields: [scenarioId], references: [id])
+  messages  Message[]
+}
+
+model Message {
+  id              String          @id @default(cuid())
+  conversationId  String
+  role            MessageRole     @default(USER)
+  content         String
+  correctedText   String?
+  languageId      String?
+  metadata        Json?
+  createdAt       DateTime        @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id])
+  language     Language?    @relation(fields: [languageId], references: [id])
+  vocabularyEntries Vocabulary[]
+}
+
+model Vocabulary {
+  id              String           @id @default(cuid())
+  userId          String
+  languageId      String
+  term            String
+  translation     String
+  context         String?
+  sourceMessageId String?
+  status          VocabularyStatus @default(LEARNING)
+  proficiency     Int?             @default(0)
+  tags            String[]         @default([])
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  user          User       @relation(fields: [userId], references: [id])
+  language      Language   @relation(fields: [languageId], references: [id])
+  sourceMessage Message?   @relation(fields: [sourceMessageId], references: [id])
+}
+
+model Statistic {
+  id        String        @id @default(cuid())
+  userId    String
+  type      StatisticType
+  value     Float
+  period    DateTime?
+  metadata  Json?
+  createdAt DateTime      @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum ScenarioDifficulty {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum ConversationStatus {
+  ACTIVE
+  COMPLETED
+  ABANDONED
+}
+
+enum MessageRole {
+  USER
+  ASSISTANT
+  SYSTEM
+}
+
+enum VocabularyStatus {
+  LEARNING
+  REVIEWED
+  MASTERED
+}
+
+enum StatisticType {
+  SESSIONS_TIME
+  LESSONS_COMPLETED
+  VOCABULARY_LEARNED
+  STREAK
+}
