@@ -4,12 +4,20 @@ import { AppError } from '../utils/app-error';
 import {
   signAccessToken,
   signRefreshToken,
-  verifyRefreshToken
+  verifyRefreshToken,
 } from '../utils/jwt';
 import type { TokenPayload } from '../types/auth';
 
 export const AuthService = {
-  register: async ({ email, password, fullName }: { email: string; password: string; fullName?: string }) => {
+  register: async ({
+    email,
+    password,
+    fullName,
+  }: {
+    email: string;
+    password: string;
+    fullName?: string;
+  }) => {
     const existingUser = await prisma.user.findUnique({ where: { email } });
 
     if (existingUser) {
@@ -22,15 +30,19 @@ export const AuthService = {
       data: {
         email,
         passwordHash,
-        fullName: fullName?.trim() || undefined
-      }
+        fullName: fullName?.trim() || undefined,
+      },
     });
 
-    const tokens = await AuthService.createTokens(user.id, user.email, user.role);
+    const tokens = await AuthService.createTokens(
+      user.id,
+      user.email,
+      user.role,
+    );
 
     return {
       user: AuthService.getSafeUser(user),
-      tokens
+      tokens,
     };
   },
 
@@ -49,27 +61,36 @@ export const AuthService = {
 
     const updatedUser = await prisma.user.update({
       where: { id: user.id },
-      data: { lastLogin: new Date() }
+      data: { lastLogin: new Date() },
     });
 
-    const tokens = await AuthService.createTokens(updatedUser.id, updatedUser.email, updatedUser.role);
+    const tokens = await AuthService.createTokens(
+      updatedUser.id,
+      updatedUser.email,
+      updatedUser.role,
+    );
 
     return {
       user: AuthService.getSafeUser(user),
-      tokens
+      tokens,
     };
   },
 
   refresh: async ({ refreshToken }: { refreshToken: string }) => {
     const tokenPayload = verifyRefreshToken(refreshToken);
 
-    const user = await prisma.user.findUnique({ where: { id: tokenPayload.userId } });
+    const user = await prisma.user.findUnique({
+      where: { id: tokenPayload.userId },
+    });
 
     if (!user || !user.refreshTokenHash) {
       throw new AppError('Refresh token inválido', 401);
     }
 
-    const refreshTokenMatches = await bcrypt.compare(refreshToken, user.refreshTokenHash);
+    const refreshTokenMatches = await bcrypt.compare(
+      refreshToken,
+      user.refreshTokenHash,
+    );
 
     if (!refreshTokenMatches) {
       throw new AppError('Refresh token inválido', 401);
@@ -86,16 +107,29 @@ export const AuthService = {
 
     await prisma.user.update({
       where: { id: userId },
-      data: { refreshTokenHash }
+      data: { refreshTokenHash },
     });
 
     return {
       accessToken,
-      refreshToken
+      refreshToken,
     };
   },
 
-  getSafeUser: (user: { id: string; email: string; fullName?: string | null; role: string; nativeLanguageId?: string | null; targetLanguageId?: string | null; level?: string | null; objectives?: string | null; preferences?: unknown | null; createdAt: Date; updatedAt: Date; lastLogin?: Date | null }) => {
+  getSafeUser: (user: {
+    id: string;
+    email: string;
+    fullName?: string | null;
+    role: string;
+    nativeLanguageId?: string | null;
+    targetLanguageId?: string | null;
+    level?: string | null;
+    objectives?: string | null;
+    preferences?: unknown | null;
+    createdAt: Date;
+    updatedAt: Date;
+    lastLogin?: Date | null;
+  }) => {
     return {
       id: user.id,
       email: user.email,
@@ -108,7 +142,7 @@ export const AuthService = {
       preferences: user.preferences ?? null,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
-      lastLogin: user.lastLogin ?? null
+      lastLogin: user.lastLogin ?? null,
     };
-  }
+  },
 };

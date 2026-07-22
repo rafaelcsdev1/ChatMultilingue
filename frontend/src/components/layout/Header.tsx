@@ -4,11 +4,20 @@ interface HeaderProps {
   isDarkMode: boolean;
 }
 
-export function Header({ onToggleSidebar, onToggleTheme, isDarkMode }: HeaderProps) {
+export function Header({
+  onToggleSidebar,
+  onToggleTheme,
+  isDarkMode,
+}: HeaderProps) {
   return (
     <header className="app-header">
       <div className="header-left">
-        <button className="icon-button mobile-menu" type="button" onClick={onToggleSidebar} aria-label="Abrir menu">
+        <button
+          className="icon-button mobile-menu"
+          type="button"
+          onClick={onToggleSidebar}
+          aria-label="Abrir menu"
+        >
           ☰
         </button>
         <div>
@@ -18,7 +27,11 @@ export function Header({ onToggleSidebar, onToggleTheme, isDarkMode }: HeaderPro
       </div>
 
       <div className="header-actions">
-        <button className="button-secondary" type="button" onClick={onToggleTheme}>
+        <button
+          className="button-secondary"
+          type="button"
+          onClick={onToggleTheme}
+        >
           {isDarkMode ? 'Modo claro' : 'Modo escuro'}
         </button>
       </div>

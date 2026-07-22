@@ -9,10 +9,12 @@ export function validateBody(schema: AnyZodObject) {
     if (!result.success) {
       const errorMessages = result.error.errors.map((error) => ({
         path: error.path.join('.'),
-        message: error.message
+        message: error.message,
       }));
 
-      return next(new AppError('Dados de entrada inválidos', 400, errorMessages));
+      return next(
+        new AppError('Dados de entrada inválidos', 400, errorMessages),
+      );
     }
 
     req.body = result.data;
